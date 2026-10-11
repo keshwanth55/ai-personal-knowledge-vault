@@ -4,6 +4,8 @@ server:
     include-message: always
 
 spring:
+  config:
+    import: "optional:file:.env[.properties],optional:file:backend/.env[.properties]"
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:h2:file:./data/knowledge-vault;AUTO_SERVER=TRUE}
     username: ${SPRING_DATASOURCE_USERNAME:sa}

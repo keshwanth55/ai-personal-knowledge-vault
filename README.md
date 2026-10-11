@@ -31,6 +31,8 @@ cd backend
 mvn spring-boot:run
 ```
 
+The backend reads local settings from `backend/.env`. Spring Boot loads it automatically whether you start Maven inside `backend` or from the project root. Edit that file to use your Aiven MySQL connection. If it is missing after cloning the repository, create it from the committed-safe template by running `Copy-Item .env.example .env` from the `backend` directory. Operating-system environment variables override values in `.env`. Never commit real database passwords or production secrets.
+
 2. In a second terminal, start the React app:
 
 ```powershell
