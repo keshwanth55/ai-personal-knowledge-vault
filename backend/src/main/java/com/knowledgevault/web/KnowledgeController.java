@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -13,6 +14,11 @@ public class KnowledgeController {
     private final KnowledgeService knowledge;
 
     public KnowledgeController(KnowledgeService knowledge) { this.knowledge = knowledge; }
+
+    @GetMapping("/health")
+    public Map<String, String> health() {
+        return Map.of("status", "UP");
+    }
 
     @PostMapping("/chat")
     public KnowledgeService.ChatAnswer ask(Authentication authentication, @Valid @RequestBody Question request) {

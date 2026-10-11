@@ -69,9 +69,15 @@ If Ollama is unavailable, uploads and keyword-based retrieval still work. The as
 
 This is a starter MVP. Before production, set a unique long JWT secret, use private persistent file storage, enable HTTPS, configure backups and retention, add rate limits and email verification, and review your privacy/security requirements. For Aiven MySQL, set `SPRING_DATASOURCE_URL` to the JDBC form of Aiven's connection URL, for example `jdbc:mysql://HOST:PORT/DBNAME?sslMode=REQUIRED`, and set `SPRING_DATASOURCE_USERNAME` and `SPRING_DATASOURCE_PASSWORD` in the hosting provider's secret environment settings. Do not commit database credentials.
 
-## Deployment files
+## Deployment
 
-- `Dockerfile` builds the backend with Java 21 in a multi-stage image. Configure Render to use Docker and the repository-root `./Dockerfile`; Render supplies the `PORT` environment variable.
-- `netlify.toml` configures a Git-based Netlify build from `frontend/`. Set the Netlify build environment variable `VITE_API_URL` to the Render API URL ending in `/api`. For manual deploy, set it in PowerShell before `npm run build`, then drag `frontend/dist` to Netlify.
-- Set the Render environment variable `CORS_ALLOWED_ORIGINS` to the exact Netlify site origin (for example `https://your-site.netlify.app`, without a trailing slash). Also set `VAULT_JWT_SECRET` to a unique random secret and `H2_CONSOLE_ENABLED=false`.
-- `VAULT_STORAGE_DIR` defaults to `./uploads`. Render's container filesystem is ephemeral; configure persistent storage or move original files to object storage before relying on uploaded originals in production.
+The repository includes a Render Blueprint (`render.yaml`) for the Docker backend and `netlify.toml` for the Vite frontend.
+
+1. Push this repository to GitHub and create a Blueprint in Render from it. Set the prompted `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD` (Aiven MySQL), and `CORS_ALLOWED_ORIGINS` values. Render generates `VAULT_JWT_SECRET`; `H2_CONSOLE_ENABLED` is disabled.
+2. Deploy the frontend from the same repository in Netlify. Set `VITE_API_URL` to `https://<your-render-service>.onrender.com/api` in the Netlify environment settings and redeploy.
+3. Set `CORS_ALLOWED_ORIGINS` on Render to the exact Netlify site origin, then redeploy the backend.
+4. Check the backend at `/api/health` and create an account in the frontend.
+
+Ollama runs locally by default. A cloud deployment cannot reach Ollama on your laptop; configure a reachable, secured Ollama-compatible endpoint with `OLLAMA_BASE_URL` to enable generated chat responses. Without it, document upload and keyword retrieval remain available with retrieval-only chat answers. Uploaded originals are on the container filesystem; configure persistent storage before relying on them in production.
+
+The supplied lab-structure PDF was empty when inspected, so the deployment follows this repository's Render and Netlify configuration.
