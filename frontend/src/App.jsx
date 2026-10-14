@@ -11,7 +11,7 @@ const prettySize = (bytes = 0) => bytes < 1024 * 1024
   ? `${Math.max(1, Math.round(bytes / 1024))} KB`
   : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 
-function AuthScreen({ onLogin }) {
+function AuthScreen({ onLogin, onHome }) {
   const [mode, setMode] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -36,6 +36,7 @@ function AuthScreen({ onLogin }) {
   return (
     <main className="auth-page">
       <div className="auth-card">
+        <button className="auth-home-link" onClick={onHome}>← Back to home</button>
         <div className="brand-mark"><BookOpen size={21} /></div>
         <p className="eyebrow">YOUR SECOND BRAIN</p>
         <h1>Your knowledge,<br />all in one place.</h1>
@@ -53,8 +54,26 @@ function AuthScreen({ onLogin }) {
   );
 }
 
+function HomePage({ onGetStarted, onSignIn }) {
+  return (
+    <main className="home-page">
+      <header className="home-nav">
+        <a className="brand" href="#home"><span className="brand-mark"><BookOpen size={19} /></span><span>mindspace<span className="brand-dot">.</span></span></a>
+        <nav><a href="#how-it-works">How it works</a><a href="#privacy">Privacy</a><button className="home-signin" onClick={onSignIn}>Sign in</button><button className="primary-button" onClick={onGetStarted}>Get started <ArrowUp size={15} /></button></nav>
+      </header>
+      <section className="home-hero" id="home">
+        <div className="home-copy"><p className="eyebrow"><Sparkles size={13} /> YOUR PERSONAL KNOWLEDGE SPACE</p><h1>Everything you learn,<br /><span>all in one place.</span></h1><p className="home-lede">Bring your notes and documents together. Search what you’ve saved and ask questions with answers grounded in your own knowledge.</p><div className="home-actions"><button className="primary-button" onClick={onGetStarted}>Build your knowledge library <ArrowUp size={16} /></button><a href="#how-it-works">See how it works <ArrowDown size={15} /></a></div><p className="home-trust"><ShieldCheck size={15} /> Your documents stay private to your account</p></div>
+        <div className="home-preview" aria-label="Mindspace product preview"><div className="preview-top"><span className="brand-mark"><BookOpen size={16} /></span><strong>Your knowledge</strong><span className="private-pill"><span /> Private</span></div><div className="preview-body"><div className="preview-label">ASK YOUR LIBRARY</div><div className="preview-question">What are the key ideas in my research notes?</div><div className="preview-answer"><span className="assistant-icon"><Sparkles size={15} /></span><div><strong>A thoughtful answer, grounded in your sources.</strong><p>Mindspace finds the relevant passages in your documents and brings the ideas together.</p><div className="preview-source"><FileText size={13} /> research-notes.pdf <span>Source</span></div></div></div><div className="preview-input">Ask a question about your knowledge... <span><ArrowUp size={14} /></span></div></div><div className="preview-foot"><FolderOpen size={14} /> Your library <span>Notes · Papers · Documents</span></div></div>
+      </section>
+      <section className="home-features" id="how-it-works"><div><span className="feature-icon"><FolderOpen size={18} /></span><h2>One home for your knowledge</h2><p>Bring notes, papers, and documents into a personal library that’s easy to explore.</p></div><div><span className="feature-icon"><Search size={18} /></span><h2>Find the idea you need</h2><p>Search by meaning and rediscover useful details, even if you forget the exact words.</p></div><div><span className="feature-icon"><MessageCircle size={18} /></span><h2>Ask questions, get context</h2><p>Get answers connected to the material you saved, with source passages to follow up.</p></div></section>
+      <footer className="home-footer" id="privacy"><span>mindspace<span className="brand-dot">.</span></span><span><ShieldCheck size={14} /> A private space for your ideas and documents</span></footer>
+    </main>
+  );
+}
+
 function App() {
   const [email, setEmail] = useState('');
+  const [screen, setScreen] = useState('home');
   const [documents, setDocuments] = useState([]);
   const [active, setActive] = useState('assistant');
   const [question, setQuestion] = useState('');
@@ -152,11 +171,13 @@ function App() {
     localStorage.removeItem('vault-token');
     localStorage.removeItem('vault-email');
     setEmail('');
+    setScreen('home');
     setDocuments([]);
     setMessages([]);
   }
 
-  if (!email) return <AuthScreen onLogin={setEmail} />;
+  if (!email && screen === 'home') return <HomePage onGetStarted={() => setScreen('auth')} onSignIn={() => setScreen('auth')} />;
+  if (!email) return <AuthScreen onLogin={setEmail} onHome={() => setScreen('home')} />;
 
   return (
     <div className="app-shell">
